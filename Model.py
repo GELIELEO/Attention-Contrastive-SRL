@@ -136,6 +136,7 @@ class Self_Attn(nn.Module):
         self.key_conv = nn.Conv2d(in_channels = in_dim , out_channels = in_dim//8 , kernel_size= 1)
         self.value_conv = nn.Conv2d(in_channels = in_dim , out_channels = in_dim , kernel_size= 1)
         self.gamma = nn.Parameter(torch.zeros(1))
+        self.beta = nn.Parameter(torch.ones(1))
 
         self.softmax  = nn.Softmax(dim=-1) #
     def forward(self,x):
@@ -156,7 +157,7 @@ class Self_Attn(nn.Module):
         out = torch.bmm(proj_value,attention.permute(0,2,1) )
         out = out.view(m_batchsize,C,width,height)
         
-        out = self.gamma*out + x
+        out = self.gamma*out + self.beta*x
         return out, attention
 
 def init(module, weight_init, bias_init, gain=1):
